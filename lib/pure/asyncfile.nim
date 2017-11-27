@@ -112,14 +112,8 @@ proc openAsync*(filename: string, mode = fmRead): AsyncFile =
       result.offset = getFileSize(result)
 
   else:
-    let flags = getPosixFlags(mode)
-    # RW (Owner), RW (Group), R (Other)
-    let perm = S_IRUSR or S_IWUSR or S_IRGRP or S_IWGRP or S_IROTH
-    let fd = open(filename, flags, perm).AsyncFD
-    if fd.cint == -1:
-      raiseOSError(osLastError())
-
-    result = newAsyncFile(fd)
+    let fd = open(filename, mode).getFileHandle()
+    result = newAsyncFile(fd.AsyncFD)
 
 proc readBuffer*(f: AsyncFile, buf: pointer, size: int): Future[int] =
   ## Read ``size`` bytes from the specified file asynchronously starting at

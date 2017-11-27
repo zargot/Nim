@@ -41,12 +41,8 @@ proc main() {.async.} =
     await file.write("test2")
     file.close()
     file = openAsync(fn, fmWrite)
-    await file.write("test3")
     file.close()
-    file = openAsync(fn, fmRead)
-    let data = await file.readAll()
-    doAssert data == "test3"
-    file.close()
+    doAssert getFileSize(fn) == 0 # This is consistent with open()
 
 
 waitFor main()
